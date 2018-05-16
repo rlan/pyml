@@ -97,7 +97,7 @@ class BoundingBox:
     Each contour is an ndarray of shape (n, 2), consisting of n (row, column) coordinates along the contour.
     @return: list of (n,2)-ndarrays
     """
-    return np.array([self.ul(), self.ur(), self.ll(), self.lr()])
+    return np.array([self.ul(), self.ur(), self.lr(), self.ll(), self.ul()])
 
   def bound(self, upper_left = None, lower_right = None):
     """
