@@ -5,20 +5,22 @@ Bounding Box object
 Examples:
 >>> from BoundingBox import BoundingBox
 >>> box = BoundingBox( (1,2), (4,5) )
->>> print(box.ul())
-[1 2]
->>> print(box.lr())
-[4 5]
->>> print(box.area())
+>>> box.ul()
+array([1, 2])
+>>> box.lr()
+array([4, 5])
+>>> box.area()
 9
->>> print(box.isSmall(threshold=16))
+>>> box.isSmall(threshold=16)
 True
->>> print(box.bound(lower_right=[3,4]).lr())
-[3 4]
->>> print(box.bound(upper_left=[2,3]).ul())
-[2 3]
->>> print(box.area())
+>>> box.bound(lower_right=[3,4]).lr()
+array([3, 4])
+>>> box.bound(upper_left=[2,3]).ul()
+array([2, 3])
+>>> box.area()
 1
+>>> print(box)
+[2 3], [3 4]
 """
 
 from __future__ import print_function
@@ -84,6 +86,9 @@ class BoundingBox:
         self.lower_right_[1] = lower_right[1]
 
     return self
+
+  def __str__(self):
+    return "{}, {}".format(self.upper_left_, self.lower_right_)
 
 
 if __name__ == "__main__":
