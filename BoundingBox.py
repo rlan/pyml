@@ -40,12 +40,12 @@ import numpy as np
 class BoundingBox:
 
   def __init__(self, upper_left=None, lower_right=None):
-    if upper_left == None:
+    if upper_left is None:
       self.upper_left_ = np.zeros(1,2)
     else:
       self.upper_left_ = np.array(upper_left)
 
-    if lower_right == None:
+    if lower_right is None:
       self.lower_right_ = np.zeros(1,2)
     else:      
       self.lower_right_ = np.array(lower_right)
@@ -104,13 +104,13 @@ class BoundingBox:
     Limit bounding box corners in place.
     @return: Self
     """
-    if upper_left != None:
+    if upper_left is not None:
       if upper_left[0] > self.upper_left_[0]:
         self.upper_left_[0] = upper_left[0]
       if upper_left[1] > self.upper_left_[1]:
         self.upper_left_[1] = upper_left[1]
 
-    if lower_right != None:
+    if lower_right is not None:
       if self.lower_right_[0] > lower_right[0]:
         self.lower_right_[0] = lower_right[0]
       if self.lower_right_[1] > lower_right[1]:
