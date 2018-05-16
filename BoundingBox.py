@@ -9,6 +9,15 @@ Examples:
 array([1, 2])
 >>> box.lr()
 array([4, 5])
+>>> box.ur()
+array([4, 2])
+>>> box.ll()
+array([1, 5])
+>>> box.contour()
+array([[1, 2],
+       [4, 2],
+       [1, 5],
+       [4, 5]])
 >>> box.area()
 9
 >>> box.isSmall(threshold=16)
@@ -69,9 +78,31 @@ class BoundingBox:
     """
     return self.lower_right_
 
+  def ur(self):
+    """
+    Return the upper right point
+    @return: An array, e.g. (row, col)
+    """
+    return np.array([self.lower_right_[0], self.upper_left_[1]])
+
+  def ll(self):
+    """
+    Return the lower left point
+    @return: An array, e.g. (row, col)
+    """
+    return np.array([self.upper_left_[0], self.lower_right_[1]])
+
+  def contour(self):
+    """
+    Each contour is an ndarray of shape (n, 2), consisting of n (row, column) coordinates along the contour.
+    @return: list of (n,2)-ndarrays
+    """
+    return np.array([self.ul(), self.ur(), self.ll(), self.lr()])
+
   def bound(self, upper_left = None, lower_right = None):
     """
     Limit bounding box corners in place.
+    @return: Self
     """
     if upper_left != None:
       if upper_left[0] > self.upper_left_[0]:
