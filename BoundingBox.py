@@ -16,8 +16,9 @@ array([1, 5])
 >>> box.contour()
 array([[1, 2],
        [4, 2],
+       [4, 5],
        [1, 5],
-       [4, 5]])
+       [1, 2]])
 >>> box.area()
 9
 >>> box.isSmall(threshold=16)
@@ -123,5 +124,7 @@ class BoundingBox:
 
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+  import doctest 
+  import sys 
+  (failure_count, test_count) = doctest.testmod() 
+  sys.exit(failure_count) 
