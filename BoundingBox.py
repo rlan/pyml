@@ -16,8 +16,9 @@ array([1, 5])
 >>> box.contour()
 array([[1, 2],
        [4, 2],
+       [4, 5],
        [1, 5],
-       [4, 5]])
+       [1, 2]])
 >>> box.area()
 9
 >>> box.isSmall(threshold=16)
