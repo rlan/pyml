@@ -8,3 +8,4 @@ install:
 script:
   - python BoundingBox.py
   - python RunningMean.py
+  - python RunningStats.py
