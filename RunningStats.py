@@ -100,5 +100,7 @@ class RunningStats:
 
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+  import doctest
+  import sys
+  (failure_count, test_count) = doctest.testmod()
+  sys.exit(failure_count)
