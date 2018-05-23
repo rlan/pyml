@@ -7,6 +7,7 @@ class BoundingBox:
   """"Bounding Box object
   - works for pixel values as well as real values.
 
+    >>> import numpy as np
     >>> from BoundingBox import BoundingBox
     >>> box = BoundingBox( (1,2), (4,5) )
     >>> box.ul()
@@ -34,11 +35,13 @@ class BoundingBox:
     >>> box.area()
     1
     >>> print(box)
-    [2 3], [3 4]
+    [[2 3]
+     [3 4]]
 
-    >>> import numpy as np
-    >>> print(BoundingBox.fromContour(np.array([[1, 2], [4, 2], [4, 5], [1, 5], [1, 2]])))
-    [1. 2.], [4. 5.]
+    >>> contour = np.array([[1, 2], [4, 2], [4, 5], [1, 5], [1, 2]])
+    >>> print(BoundingBox.fromContour(contour))
+    [[1. 2.]
+     [4. 5.]]
   """
 
   def __init__(self, upper_left=None, lower_right=None):
@@ -52,11 +55,13 @@ class BoundingBox:
       self.upper_left_ = np.zeros(2)
     else:
       self.upper_left_ = np.array(upper_left)
+      #print(type(self.upper_left_), self.upper_left_)
 
     if lower_right is None:
       self.lower_right_ = np.zeros(2)
     else:      
       self.lower_right_ = np.array(lower_right)
+      #print(type(self.lower_right_), self.lower_right_)
 
   @classmethod
   def fromContour(cls, contour):
@@ -182,7 +187,8 @@ class BoundingBox:
     str
       String representation of self.
     """
-    return "{}, {}".format(self.upper_left_, self.lower_right_)
+    x = np.array([self.upper_left_, self.lower_right_])
+    return "{}".format(x)
 
 
 if __name__ == "__main__":
