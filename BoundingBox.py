@@ -4,8 +4,7 @@ from __future__ import division
 import numpy as np
 
 class BoundingBox:
-  """
-  Bounding Box object
+  """"Bounding Box object
   - works for pixel values as well as real values.
 
     >>> from BoundingBox import BoundingBox
@@ -39,6 +38,12 @@ class BoundingBox:
   """
 
   def __init__(self, upper_left=None, lower_right=None):
+    """Init object if upper left or lower right point is given.
+    Parameters
+    ----------
+    upper_left : np.array(1, 2)
+    lower_right : np.array(1, 2)
+    """
     if upper_left is None:
       self.upper_left_ = np.zeros(1,2)
     else:
@@ -51,7 +56,10 @@ class BoundingBox:
 
   def area(self):
     """
-    @return: Return area of bounding box
+    Returns
+    -------
+    double
+      Area of bounding box.
     """
     width = self.lower_right_[0] - self.upper_left_[0]
     height = self.lower_right_[1] - self.upper_left_[1]
@@ -59,49 +67,75 @@ class BoundingBox:
 
   def isSmall(self, threshold = 16):
     """
-    @return: Return True if area is less than threshold, otherwise False
+    Parameters
+    ----------
+    threshold : int
+      Threshold to compare against.
+
+    Returns
+    -------
+    bool
+      True if area is less than threshold, otherwise False.
     """
     return self.area() < threshold
 
   def ul(self):
     """
-    Return the upper left point
-    @return: An array, e.g. (row, col)
+    Returns
+    -------
+    np.array(1, 2)
+      Return the upper left point, e.g. (row, col)
     """
     return self.upper_left_
 
   def lr(self):
     """
-    Return the lower right point
-    @return: An array, e.g. (row, col)
+    Returns
+    -------
+    np.array(1, 2)
+      Return the lower right point, e.g. (row, col)
     """
     return self.lower_right_
 
   def ur(self):
     """
-    Return the upper right point
-    @return: An array, e.g. (row, col)
+    Returns
+    -------
+    np.array(1, 2)
+      Return the upper right point, e.g. (row, col)
     """
     return np.array([self.lower_right_[0], self.upper_left_[1]])
 
   def ll(self):
     """
-    Return the lower left point
-    @return: An array, e.g. (row, col)
+    Returns
+    -------
+    np.array(1, 2)
+      Return the lower left point, e.g. (row, col)
     """
     return np.array([self.upper_left_[0], self.lower_right_[1]])
 
   def contour(self):
     """
-    Each contour is an ndarray of shape (n, 2), consisting of n (row, column) coordinates along the contour.
-    @return: list of (n,2)-ndarrays
+    Returns
+    -------
+    A np.array of np.array(1, 2)
+      Each contour is an ndarray of shape (n, 2), consisting of n (row, column) coordinates along the contour.
     """
     return np.array([self.ul(), self.ur(), self.lr(), self.ll(), self.ul()])
 
   def bound(self, upper_left = None, lower_right = None):
-    """
-    Limit bounding box corners in place.
-    @return: Self
+    """Trim bounding box by given limits.
+
+    Parameters
+    ----------
+    upper_left : np.array(1, 2)
+    lower_right : np.array(1, 2)
+
+    Returns
+    -------
+    self
+      Modified self object
     """
     if upper_left is not None:
       if upper_left[0] > self.upper_left_[0]:
@@ -118,6 +152,12 @@ class BoundingBox:
     return self
 
   def __str__(self):
+    """Return string representation
+    Returns
+    -------
+    str
+      String representation of self.
+    """
     return "{}, {}".format(self.upper_left_, self.lower_right_)
 
 
