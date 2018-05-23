@@ -1,44 +1,42 @@
-"""
-Bounding Box object
-- works for pixel values as well as real values.
-
-Examples:
->>> from BoundingBox import BoundingBox
->>> box = BoundingBox( (1,2), (4,5) )
->>> box.ul()
-array([1, 2])
->>> box.lr()
-array([4, 5])
->>> box.ur()
-array([4, 2])
->>> box.ll()
-array([1, 5])
->>> box.contour()
-array([[1, 2],
-       [4, 2],
-       [4, 5],
-       [1, 5],
-       [1, 2]])
->>> box.area()
-9
->>> box.isSmall(threshold=16)
-True
->>> box.bound(lower_right=[3,4]).lr()
-array([3, 4])
->>> box.bound(upper_left=[2,3]).ul()
-array([2, 3])
->>> box.area()
-1
->>> print(box)
-[2 3], [3 4]
-"""
-
 from __future__ import print_function
 from __future__ import division
 
 import numpy as np
 
 class BoundingBox:
+  """
+  Bounding Box object
+  - works for pixel values as well as real values.
+
+    >>> from BoundingBox import BoundingBox
+    >>> box = BoundingBox( (1,2), (4,5) )
+    >>> box.ul()
+    array([1, 2])
+    >>> box.lr()
+    array([4, 5])
+    >>> box.ur()
+    array([4, 2])
+    >>> box.ll()
+    array([1, 5])
+    >>> box.contour()
+    array([[1, 2],
+           [4, 2],
+           [4, 5],
+           [1, 5],
+           [1, 2]])
+    >>> box.area()
+    9
+    >>> box.isSmall(threshold=16)
+    True
+    >>> box.bound(lower_right=[3,4]).lr()
+    array([3, 4])
+    >>> box.bound(upper_left=[2,3]).ul()
+    array([2, 3])
+    >>> box.area()
+    1
+    >>> print(box)
+    [2 3], [3 4]
+  """
 
   def __init__(self, upper_left=None, lower_right=None):
     if upper_left is None:
