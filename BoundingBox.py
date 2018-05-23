@@ -35,24 +35,48 @@ class BoundingBox:
     1
     >>> print(box)
     [2 3], [3 4]
+
+    >>> import numpy as np
+    >>> print(BoundingBox.fromContour(np.array([[1, 2], [4, 2], [4, 5], [1, 5], [1, 2]])))
+    [1. 2.], [4. 5.]
   """
 
   def __init__(self, upper_left=None, lower_right=None):
     """Init object if upper left or lower right point is given.
     Parameters
     ----------
-    upper_left : np.array(1, 2)
-    lower_right : np.array(1, 2)
+    upper_left : np.array(2)
+    lower_right : np.array(2)
     """
     if upper_left is None:
-      self.upper_left_ = np.zeros(1,2)
+      self.upper_left_ = np.zeros(2)
     else:
       self.upper_left_ = np.array(upper_left)
 
     if lower_right is None:
-      self.lower_right_ = np.zeros(1,2)
+      self.lower_right_ = np.zeros(2)
     else:      
       self.lower_right_ = np.array(lower_right)
+
+  @classmethod
+  def fromContour(cls, contour):
+    """Create a bounding box from a contour set.
+
+    Parameters
+    ----------
+    contour : list of np.array(2)
+      A list of points describing a contour.
+
+    Returns
+    -------
+    self
+      A new self object.
+    """
+    mins = np.amin(contour, axis=0)
+    maxs = np.amax(contour, axis=0)
+    upper_left = np.floor(mins)  # assumes pixel as coordinates
+    lower_right = np.floor(maxs) # assumes pixel as coordinates
+    return cls(upper_left, lower_right)
 
   def area(self):
     """
@@ -83,7 +107,7 @@ class BoundingBox:
     """
     Returns
     -------
-    np.array(1, 2)
+    np.array(2)
       Return the upper left point, e.g. (row, col)
     """
     return self.upper_left_
@@ -92,7 +116,7 @@ class BoundingBox:
     """
     Returns
     -------
-    np.array(1, 2)
+    np.array(2)
       Return the lower right point, e.g. (row, col)
     """
     return self.lower_right_
@@ -101,7 +125,7 @@ class BoundingBox:
     """
     Returns
     -------
-    np.array(1, 2)
+    np.array(2)
       Return the upper right point, e.g. (row, col)
     """
     return np.array([self.lower_right_[0], self.upper_left_[1]])
@@ -110,7 +134,7 @@ class BoundingBox:
     """
     Returns
     -------
-    np.array(1, 2)
+    np.array(2)
       Return the lower left point, e.g. (row, col)
     """
     return np.array([self.upper_left_[0], self.lower_right_[1]])
@@ -119,7 +143,7 @@ class BoundingBox:
     """
     Returns
     -------
-    A np.array of np.array(1, 2)
+    A np.array of np.array(2)
       Each contour is an ndarray of shape (n, 2), consisting of n (row, column) coordinates along the contour.
     """
     return np.array([self.ul(), self.ur(), self.lr(), self.ll(), self.ul()])
@@ -129,13 +153,13 @@ class BoundingBox:
 
     Parameters
     ----------
-    upper_left : np.array(1, 2)
-    lower_right : np.array(1, 2)
+    upper_left : np.array(2)
+    lower_right : np.array(2)
 
     Returns
     -------
     self
-      Modified self object
+      Modified self object.
     """
     if upper_left is not None:
       if upper_left[0] > self.upper_left_[0]:
