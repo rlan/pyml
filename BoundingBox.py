@@ -3,6 +3,112 @@ from __future__ import division
 
 import numpy as np
 
+class Line:
+  """Line object
+
+  Example
+  -------
+  >>> from BoundingBox import Line
+  >>> l1 = Line(-2, 2)
+  >>> l1.length()
+  4
+
+  Test cases:
+  --- first
+  === second
+
+      ======
+  --
+        --
+  ------
+  ----------
+  --------------
+      ----------
+              --
+
+  No overlap.
+  >>> x = Line.fromOverlap(Line(1,10), Line(10,20))
+  >>> print(x)
+  [0 0]
+  >>> x.length()
+  0
+
+  >>> x = Line.fromOverlap(Line(11,12), Line(10,20))
+  >>> print(x)
+  [11 12]
+  >>> x.length()
+  1
+
+  Overlap of 2, first left.
+  >>> x = Line.fromOverlap(Line(8,12), Line(10,20))
+  >>> print(x)
+  [10 12]
+  >>> x.length()
+  2
+
+  Edge overlap
+  >>> x = Line.fromOverlap(Line(6,20), Line(10,20))
+  >>> print(x)
+  [10 20]
+  >>> x.length()
+  10
+
+  Second completely inside first.
+  >>> x = Line.fromOverlap(Line(1,40), Line(20,30))
+  >>> print(x)
+  [20 30]
+  >>> x.length()
+  10
+
+  Edge overlap
+  >>> x = Line.fromOverlap(Line(10,25), Line(10,20))
+  >>> print(x)
+  [10 20]
+  >>> x.length()
+  10
+
+  No overlap
+  >>> x = Line.fromOverlap(Line(0,10), Line(-10,-5))
+  >>> print(x)
+  [0 0]
+  >>> x.length()
+  0
+  """
+  def __init__(self, x1, x2):
+    self.x1 = x1
+    self.x2 = x2
+
+  def __str__(self):
+    return "[{} {}]".format(self.x1, self.x2)
+
+  def length(self):
+    return self.x2 - self.x1
+
+  @classmethod
+  def fromOverlap(cls, first, second):
+    #print("first", first)
+    #print("second", second)
+    if first.x2 <= second.x1:
+      #print("return 0")
+      return cls(0, 0)
+    elif first.x2 <= second.x2:
+      if first.x1 >= second.x1:
+        #print("return 1")
+        return first
+      else:
+        #print("return 2")
+        return cls(second.x1, first.x2)
+    else: # first.x2 > second.x2
+      if first.x1 >= second.x2:
+        return cls(0, 0)
+      elif first.x1 >= second.x1:
+        #print("return 3")
+        return cls(first.x1, second.x2)
+      else: # first.x1 < second.x1
+        #print("return 4")
+        return second
+
+
 class BoundingBox:
   """"Bounding Box object
   - works for pixel values as well as real values.
@@ -82,6 +188,98 @@ class BoundingBox:
     upper_left = np.floor(mins)  # assumes pixel as coordinates
     lower_right = np.floor(maxs) # assumes pixel as coordinates
     return cls(upper_left, lower_right)
+
+
+  @classmethod
+  def fromOverlap(cls, first, second):
+    """Create a bounding box of the intercept.
+
+    Parameters
+    ----------
+    first : BoundingBox
+    second : BoundingBox
+
+    Return
+    ------
+    BoundingBox
+
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+
+    Some overlap
+    >>> first = BoundingBox( (2,1), (5,4) )
+    >>> second = BoundingBox( (4,3), (8,5) )
+    >>> overlap_box = BoundingBox.fromOverlap(first, second)
+    >>> print(overlap_box)
+    [[ 4  3]
+     [ 5  4]]
+
+    No overlap
+    >>> first = BoundingBox( (2,1), (5,4) )
+    >>> second = BoundingBox( (3,5), (5,7) )
+    >>> overlap_box = BoundingBox.fromOverlap(first, second)
+    >>> print(overlap_box)
+    [[ 0  0]
+     [ 0  0]]
+
+    Share an edge
+    >>> first = BoundingBox( (4,3), (8,5) )
+    >>> second = BoundingBox( (3,5), (5,7) )
+    >>> overlap_box = BoundingBox.fromOverlap(first, second)
+    >>> print(overlap_box)
+    [[ 0  0]
+     [ 0  0]]
+
+    Second completely inside first.
+    >>> first = BoundingBox( (2,1), (9,7) )
+    >>> second = BoundingBox( (4,3), (8,5) )
+    >>> overlap_box = BoundingBox.fromOverlap(first, second)
+    >>> print(overlap_box)
+    [[ 4  3]
+     [ 8  5]]
+
+    First completely inside second.
+    >>> first = BoundingBox( (4,3), (8,5) )
+    >>> second = BoundingBox( (2,1), (9,7) )
+    >>> overlap_box = BoundingBox.fromOverlap(first, second)
+    >>> print(overlap_box)
+    [[ 4  3]
+     [ 8  5]]
+
+    First is sideway inside second on the right
+    >>> first = BoundingBox( (6,4), (7,6) )
+    >>> second = BoundingBox( (4,3), (8,5) )
+    >>> overlap_box = BoundingBox.fromOverlap(first, second)
+    >>> print(overlap_box)
+    [[ 6  4]
+     [ 7  5]]
+
+    Corner touching
+    >>> first = BoundingBox( (2,1), (5,4) )
+    >>> second = BoundingBox( (5,4), (6,5) )
+    >>> overlap_box = BoundingBox.fromOverlap(first, second)
+    >>> print(overlap_box)
+    [[ 0  0]
+     [ 0  0]]
+    """
+
+    from BoundingBox import Line
+    # row
+    line_first = Line( first.ul()[0], first.lr()[0] )
+    line_second = Line( second.ul()[0], second.lr()[0] )
+    row_overlap = Line.fromOverlap(line_first, line_second)
+    #print("row_overlap", row_overlap)
+    # col
+    line_first = Line( first.ul()[1], first.lr()[1] )
+    line_second = Line( second.ul()[1], second.lr()[1] )
+    col_overlap = Line.fromOverlap(line_first, line_second)
+    #print("col_overlap", col_overlap)
+
+    if (row_overlap.length() == 0) or (col_overlap.length() == 0):
+      return cls( (0,0), (0,0) )
+    else:
+      return cls( (row_overlap.x1, col_overlap.x1), (row_overlap.x2, col_overlap.x2) )
 
   def area(self):
     """
