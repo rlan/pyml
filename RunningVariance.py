@@ -9,32 +9,41 @@ class RunningVariance:
   Example
   -------
 
-    >>> from RunningVariance import RunningVariance
-    >>> s = RunningVariance()
-    >>> s.count()
-    0
-    >>> s.mean()
-    nan
-    >>> s.variance()
-    nan
-    >>> s.sampleVariance()
-    nan
-    >>> s([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0])
-    >>> s.count()
-    9
-    >>> s.mean()
-    5.0
-    >>> s.variance()
-    6.666666666666667
-    >>> s.sampleVariance()
-    7.5
-    >>> s.clear()
-    >>> s.count()
-    0
-    >>> s.mean()
-    nan
-    >>> s.variance()
-    nan
+  >>> from RunningVariance import RunningVariance
+  >>> s = RunningVariance()
+
+  Initial values
+  >>> s.count()
+  0
+  >>> s.mean()
+  nan
+  >>> s.variance()
+  nan
+  >>> s.sampleVariance()
+  nan
+
+  Update with some values
+  >>> data = [1.0, 2.0, 3.0, 4.0, 5, 6, 7, 8, 9]
+  >>> isinstance(s(data), RunningVariance)
+  True
+  >>> s.count()
+  9
+  >>> s.mean()
+  5.0
+  >>> s.variance()
+  6.666666666666667
+  >>> s.sampleVariance()
+  7.5
+
+  Clear
+  >>> isinstance(s.clear(), RunningVariance)
+  True
+  >>> s.count()
+  0
+  >>> s.mean()
+  nan
+  >>> s.variance()
+  nan
   
   """
 
