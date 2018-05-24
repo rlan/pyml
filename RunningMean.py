@@ -3,9 +3,13 @@ from __future__ import division
 import math
 
 class RunningMean:
-  """
-  Compute running mean.
+  """Compute running mean.
+
+  This class computes running mean.
   Recoded from https://www.johndcook.com/blog/skewness_kurtosis/
+
+  Example
+  -------
 
     >>> from RunningMean import RunningMean
     >>> s = RunningMean()
@@ -35,34 +39,76 @@ class RunningMean:
   def __init__(self):
     self.clear()
 
-  def __call__(self, x):
+  def __call__(self, input):
+    """Update running mean with input
+
+    Parameters
+    ----------
+    input : list or scalar
+
+    Returns
+    -------
+    self
+      Modified self object
+    """
     try:
-      for v in x:
-        self.update(v)
+      for scalar in input:
+        self.update(scalar)
     except TypeError:
-      self.update(x)
+      self.update(input)
     return self
 
   def __str__(self):
     return "{}".format(self.mean())
 
   def clear(self):
+    """Clear state and running mean.
+
+    Returns
+    -------
+    self
+      Modified self object
+    """
     self.n = 0
     self.M1 = 0.0
     return self
 
-  def update(self, x):
+  def update(self, input):
+    """Update running mean with input
+
+    Parameters
+    ----------
+    input : scalar
+
+    Returns
+    -------
+    self
+      Modified self object
+    """
     self.n += 1
-    delta = float(x) - self.M1
+    delta = float(input) - self.M1
     delta_n = delta / self.n
     self.M1 += delta_n
-
     return self
 
   def count(self):
+    """Return count.
+
+    Returns
+    -------
+    int
+      Number of data points received.
+    """
     return self.n
 
   def mean(self):
+    """Return running mean.
+
+    Returns
+    -------
+    float
+      Running mean.
+    """
     return self.M1
 
 
