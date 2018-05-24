@@ -212,56 +212,56 @@ class BoundingBox:
     >>> second = BoundingBox( (4,3), (8,5) )
     >>> overlap_box = BoundingBox.fromOverlap(first, second)
     >>> print(overlap_box)
-    [[ 4  3]
-     [ 5  4]]
+    [[4 3]
+     [5 4]]
 
     No overlap
     >>> first = BoundingBox( (2,1), (5,4) )
     >>> second = BoundingBox( (3,5), (5,7) )
     >>> overlap_box = BoundingBox.fromOverlap(first, second)
     >>> print(overlap_box)
-    [[ 0  0]
-     [ 0  0]]
+    [[0 0]
+     [0 0]]
 
     Share an edge
     >>> first = BoundingBox( (4,3), (8,5) )
     >>> second = BoundingBox( (3,5), (5,7) )
     >>> overlap_box = BoundingBox.fromOverlap(first, second)
     >>> print(overlap_box)
-    [[ 0  0]
-     [ 0  0]]
+    [[0 0]
+     [0 0]]
 
     Second completely inside first.
     >>> first = BoundingBox( (2,1), (9,7) )
     >>> second = BoundingBox( (4,3), (8,5) )
     >>> overlap_box = BoundingBox.fromOverlap(first, second)
     >>> print(overlap_box)
-    [[ 4  3]
-     [ 8  5]]
+    [[4 3]
+     [8 5]]
 
     First completely inside second.
     >>> first = BoundingBox( (4,3), (8,5) )
     >>> second = BoundingBox( (2,1), (9,7) )
     >>> overlap_box = BoundingBox.fromOverlap(first, second)
     >>> print(overlap_box)
-    [[ 4  3]
-     [ 8  5]]
+    [[4 3]
+     [8 5]]
 
     First is sideway inside second on the right
     >>> first = BoundingBox( (6,4), (7,6) )
     >>> second = BoundingBox( (4,3), (8,5) )
     >>> overlap_box = BoundingBox.fromOverlap(first, second)
     >>> print(overlap_box)
-    [[ 6  4]
-     [ 7  5]]
+    [[6 4]
+     [7 5]]
 
     Corner touching
     >>> first = BoundingBox( (2,1), (5,4) )
     >>> second = BoundingBox( (5,4), (6,5) )
     >>> overlap_box = BoundingBox.fromOverlap(first, second)
     >>> print(overlap_box)
-    [[ 0  0]
-     [ 0  0]]
+    [[0 0]
+     [0 0]]
     """
 
     from BoundingBox import Line
