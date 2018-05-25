@@ -133,8 +133,6 @@ class BoundingBox:
            [1, 2]])
     >>> box.area()
     9
-    >>> box.isSmall(threshold=16)
-    True
     >>> box.bound(lower_right=[3,4]).lr()
     array([3, 4])
     >>> box.bound(upper_left=[2,3]).ul()
@@ -353,20 +351,6 @@ class BoundingBox:
       return float('nan')
     else:
       return self.width() / self.height()
-
-  def isSmall(self, threshold = 16):
-    """
-    Parameters
-    ----------
-    threshold : int
-      Threshold to compare against.
-
-    Returns
-    -------
-    bool
-      True if area is less than threshold, otherwise False.
-    """
-    return self.area() < threshold
 
   def ul(self):
     """
