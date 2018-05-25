@@ -281,16 +281,53 @@ class BoundingBox:
     else:
       return cls( (row_overlap.x1, col_overlap.x1), (row_overlap.x2, col_overlap.x2) )
 
+  def height(self):
+    """
+    Returns
+    -------
+    float
+      Height of bounding box.
+
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+    >>> b = BoundingBox( (4,3), (8,5) )
+    >>> b.height()
+    4
+    """
+    return self.lower_right_[0] - self.upper_left_[0]
+
+  def width(self):
+    """
+    Returns
+    -------
+    float
+      Width of bounding box.
+
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+    >>> b = BoundingBox( (4,3), (8,5) )
+    >>> b.width()
+    2
+    """
+    return self.lower_right_[1] - self.upper_left_[1]    
+
   def area(self):
     """
     Returns
     -------
-    double
+    float
       Area of bounding box.
+
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+    >>> b = BoundingBox( (4,3), (8,5) )
+    >>> b.area()
+    8
     """
-    width = self.lower_right_[0] - self.upper_left_[0]
-    height = self.lower_right_[1] - self.upper_left_[1]
-    return width * height
+    return self.height() * self.width()
 
   def isSmall(self, threshold = 16):
     """
