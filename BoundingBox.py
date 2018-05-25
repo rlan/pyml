@@ -77,6 +77,7 @@ class Line:
   def __init__(self, x1, x2):
     self.x1 = x1
     self.x2 = x2
+    # TODO error check. x2 >= x1
 
   def __str__(self):
     return "[{} {}]".format(self.x1, self.x2)
@@ -157,6 +158,7 @@ class BoundingBox:
     upper_left : np.array(2)
     lower_right : np.array(2)
     """
+    #TODO error check that ul point is instead ul, lr point is indeed lr.
     if upper_left is None:
       self.upper_left_ = np.zeros(2)
     else:
@@ -328,6 +330,29 @@ class BoundingBox:
     8
     """
     return self.height() * self.width()
+
+  def aspectRatio(self):
+    """
+    Returns
+    -------
+    float
+      Aspect ratio of the box
+
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+    >>> b = BoundingBox( (4,3), (8,5) )
+    >>> b.aspectRatio()
+    0.5
+
+    >>> b = BoundingBox( (4,3), (4,5) )
+    >>> b.aspectRatio()
+    nan
+    """
+    if float(self.height()) == 0.0:
+      return float('nan')
+    else:
+      return self.width() / self.height()
 
   def isSmall(self, threshold = 16):
     """
