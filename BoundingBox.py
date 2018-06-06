@@ -77,6 +77,7 @@ class Line:
   def __init__(self, x1, x2):
     self.x1 = x1
     self.x2 = x2
+    # TODO error check. x2 >= x1
 
   def __str__(self):
     return "[{} {}]".format(self.x1, self.x2)
@@ -132,8 +133,6 @@ class BoundingBox:
            [1, 2]])
     >>> box.area()
     9
-    >>> box.isSmall(threshold=16)
-    True
     >>> box.bound(lower_right=[3,4]).lr()
     array([3, 4])
     >>> box.bound(upper_left=[2,3]).ul()
@@ -157,6 +156,7 @@ class BoundingBox:
     upper_left : np.array(2)
     lower_right : np.array(2)
     """
+    #TODO error check that ul point is instead ul, lr point is indeed lr.
     if upper_left is None:
       self.upper_left_ = np.zeros(2)
     else:
@@ -281,30 +281,76 @@ class BoundingBox:
     else:
       return cls( (row_overlap.x1, col_overlap.x1), (row_overlap.x2, col_overlap.x2) )
 
+  def height(self):
+    """
+    Returns
+    -------
+    float
+      Height of bounding box.
+
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+    >>> b = BoundingBox( (4,3), (8,5) )
+    >>> b.height()
+    4
+    """
+    return self.lower_right_[0] - self.upper_left_[0]
+
+  def width(self):
+    """
+    Returns
+    -------
+    float
+      Width of bounding box.
+
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+    >>> b = BoundingBox( (4,3), (8,5) )
+    >>> b.width()
+    2
+    """
+    return self.lower_right_[1] - self.upper_left_[1]    
+
   def area(self):
     """
     Returns
     -------
-    double
+    float
       Area of bounding box.
-    """
-    width = self.lower_right_[0] - self.upper_left_[0]
-    height = self.lower_right_[1] - self.upper_left_[1]
-    return width * height
 
-  def isSmall(self, threshold = 16):
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+    >>> b = BoundingBox( (4,3), (8,5) )
+    >>> b.area()
+    8
     """
-    Parameters
-    ----------
-    threshold : int
-      Threshold to compare against.
+    return self.height() * self.width()
 
+  def aspectRatio(self):
+    """
     Returns
     -------
-    bool
-      True if area is less than threshold, otherwise False.
+    float
+      Aspect ratio of the box
+
+    Example
+    -------
+    >>> from BoundingBox import BoundingBox
+    >>> b = BoundingBox( (4,3), (8,5) )
+    >>> b.aspectRatio()
+    0.5
+
+    >>> b = BoundingBox( (4,3), (4,5) )
+    >>> b.aspectRatio()
+    nan
     """
-    return self.area() < threshold
+    if float(self.height()) == 0.0:
+      return float('nan')
+    else:
+      return self.width() / self.height()
 
   def ul(self):
     """
