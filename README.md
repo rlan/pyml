@@ -2,6 +2,8 @@
 
 A collection of miscellaneous code related to machine learning.
 
+Code is documented in numpy documentation [style](https://numpydoc.readthedocs.io/en/latest/). Examples in the documentation also serve as [doctest](https://en.wikipedia.org/wiki/Doctest).
+
 ## Test status
 
 Branch | Status
