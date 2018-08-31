@@ -1,8 +1,11 @@
 """
 Image related routines
 """
+from __future__ import division
+from __future__ import print_function
 
 import numpy as np
+from skimage import io
 
 def floatToUint8(img, scale = None, minmax = None, scretch = False):
   """Convert floating-point matrix to 8-bit matrix for writing as JPG file
@@ -46,6 +49,24 @@ def floatToUint8(img, scale = None, minmax = None, scretch = False):
   img = np.clip(img, 0.0, 255.0)
   return img.astype(dtype='uint8')
 
+def saveImage(image, shape=(28, 28), file_name=None):
+  """Save image array as jpeg file.
+
+  Parameters
+  ----------
+  image : numpy.ndarray
+
+  Returns
+  -------
+  None
+  """
+  img = image.reshape(shape)
+  if file_name == None:
+      io.imsave('_image.jpg', img)
+  else:
+      io.imsave(file_name, img)
+
 
 if __name__ == "__main__":
   # TODO need tests
+  pass
