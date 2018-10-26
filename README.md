@@ -1,4 +1,4 @@
-# Machine Learning Utility Library in Python
+# A Machine Learning Utility Library in Python
 
 A collection of loosely organized code to assist machine learning research.
 
@@ -10,3 +10,15 @@ Branch | Status
 --- | ---
 [master](https://github.com/rlan/pyml/tree/master) | [![Test Status](https://travis-ci.org/rlan/pyml.svg?branch=master)](https://travis-ci.org/rlan/pyml)
 [develop](https://github.com/rlan/pyml/tree/develop) | [![Test Status](https://travis-ci.org/rlan/pyml.svg?branch=develop)](https://travis-ci.org/rlan/pyml)
+
+## Installation
+
+```sh
+pip install git+https://github.com/rlan/pyml.git
+```
+
+## Usage
+
+```python
+import pyml
+```
