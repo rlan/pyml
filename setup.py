@@ -3,12 +3,11 @@ import setuptools
 with open("README.md", "r") as fh:
   long_description = fh.read()
 
-with open("VERSION", "r") as fh:
-  version = fh.read()
+exec(open('pyml/version.py').read())
 
 setuptools.setup(
   name="pyml",
-  version=version,
+  version=__version__,
   author="Rick Lan",
   author_email="rlan@users.noreply.github.com",
   description="A Machine Learning Utility Library",
@@ -24,5 +23,6 @@ setuptools.setup(
   ],
   install_requires=[
     "numpy >= 1.13.3",
+    "sklearn",
   ]
 )
