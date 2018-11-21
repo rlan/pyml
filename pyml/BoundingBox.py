@@ -145,8 +145,8 @@ class BoundingBox:
 
     >>> contour = np.array([[1, 2], [4, 2], [4, 5], [1, 5], [1, 2]])
     >>> print(BoundingBox.fromContour(contour))
-    [[ 1.  2.]
-     [ 4.  5.]]
+    [[1. 2.]
+     [4. 5.]]
   """
 
   def __init__(self, upper_left=None, lower_right=None):
