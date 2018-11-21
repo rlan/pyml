@@ -23,6 +23,6 @@ setuptools.setup(
   ],
   install_requires=[
     "numpy >= 1.13.3",
-    "sklearn",
+    "sklearn < 0.22.0", # sklearn.datasets.fetch_mldata Deprecated since version 0.20: Will be removed in version 0.22
   ]
 )

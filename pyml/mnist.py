@@ -14,16 +14,33 @@ from sklearn.datasets import fetch_mldata
 # Attach to global logger
 _logger = logging.getLogger('app.' + os.path.basename(__file__))
 
-class MNIST:
+class Mnist:
   """Fetch, store and serve MNIST dataset.
   """
 
-  def __init__(self, data_home = './datasets/mnist', norm_mode=False):
-    _logger.info("Saving MNIST data in {} ...".format(data_home))
+  def __init__(self, data_home = './datasets/mnist', norm_mode=0):
+    """Constructor
+
+    Parameters
+    ----------
+    data_home : str
+        Location of local storage for Mnist dataset.
+    norm_mode : int
+        Image normalization mode for Mnist images.
+        0 (default) - raw values.
+        1 - normalize to [0, 1]
+        2 - normalize to [-1, 1]
+
+    Return
+    ------
+    None
+    """
+    _logger.info("Saving MNIST dataset in {} ...".format(data_home))
     t0 = datetime.now()
     dataset = fetch_mldata('MNIST original', data_home=data_home)
-    tdelta = datetime.now() - t0
-    _logger.info("Data saved in {} seconds".format(tdelta.total_seconds()))
+    t1 = datetime.now()
+    tdelta = t1 - t0
+    _logger.info("Dataset saved in {} seconds".format(tdelta.total_seconds()))
     self._inspectDataset(dataset)
 
     self.digit_indices = dict()
@@ -33,6 +50,8 @@ class MNIST:
     self._inspectDatasetStats(self.digit_indices, dataset.data)
     self._inspectImages(dataset.data)
     self._inspectImages(self.images)
+    tdelta = datetime.now() - t1
+    _logger.info("Dataset processed in {} seconds".format(tdelta.total_seconds()))
 
   @staticmethod
   def _inspectDataset(dataset):
@@ -61,30 +80,35 @@ class MNIST:
 
 
   @staticmethod
-  def normalize(images, norm_mode):
-    """Normalize MNIST data
-    Normalize to [0, 1] by default and optionally to [-1, 1].
+  def normalize(images, norm_mode=0):
+    """Normalize image data
 
     Parameters
     ----------
     images : numpy.ndarray
 
-    norm_mode : bool
-        If True, normalize to [-1, 1]. If false, just default normalization of [0, 1].
+    norm_mode : int
+        0 (default) - raw values.
+        1 - normalize to [0, 1]
+        2 - normalize to [-1, 1]
 
     Returns
     -------
-    numpy.ndarray(dtype='float32')
-        Normalized
+    numpy.ndarray(dtype='uint8') or numpy.ndarray(dtype='float32')
+        Raw or normalized images.
     """
+    if norm_mode == 0:
+      return images
+
     # normalize to [0, 1]
     _logger.debug("images.dtype {} should be uint8".format(images.dtype))
     images = images.astype('float32') / 255.0
     _logger.debug("images.dtype {} should be float".format(images.dtype))
 
+    # normalize to [-1, 1]
     # class torchvision.transforms.Normalize(mean, std)
     # input[channel] = (input[channel] - mean[channel]) / std[channel]
-    if norm_mode:
+    if norm_mode > 1:
       # MNIST (mean, std) = (0.1307,), (0.3081,)
       images = (images -  0.1307) / 0.3081
 
@@ -92,7 +116,7 @@ class MNIST:
     return images
 
   @staticmethod
-  def unnormalize(images, norm_mode):
+  def unnormalize(images, norm_mode=0):
     """Un-normalize MNIST data
     Un-normalize from [0, 1] (default) or from [-1, 1].
 
@@ -102,13 +126,19 @@ class MNIST:
 
     norm_mode : bool
         If True, un-normalize from [-1, 1]. If false, just default un-normalization from [0, 1].
+        0 (default) - raw values.
+        1 - normalize to [0, 1]
+        2 - normalize to [-1, 1]
 
     Returns
     -------
     numpy.ndarray(dtype='uint8')
         Un-normalized
     """
-    if norm_mode:
+    if norm_mode == 0:
+      return images
+
+    if norm_mode > 1:
       # MNIST (mean, std) = (0.1307,), (0.3081,)
       images = images*0.3081 + 0.1307
 
@@ -136,14 +166,16 @@ def _setupLogging():
   return logger
 
 def _test1():
-  mnist = MNIST(norm_mode=True)
+  mnist = Mnist(norm_mode=1)
   random_digit = random.randrange(10)
   _logger.info("random digit: {}".format(random_digit))
   num_instances = len(mnist.digit_indices[random_digit])
   _logger.info("count of {} digits: {}".format(random_digit, num_instances))
   random_index = random.randrange(num_instances)
   _logger.info("random index: {}".format(random_index))
-  _logger.info("image\n{}".format(1* (mnist.images[random_index].reshape((28,28)) > 0)))
+  random_image_index = mnist.digit_indices[random_digit][random_index]
+  _logger.info("random imgae index: {}".format(random_image_index))
+  _logger.info("image\n{}".format(1* (mnist.images[random_image_index].reshape((28,28)) > 0)))
 
 
 
