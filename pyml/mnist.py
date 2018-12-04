@@ -32,7 +32,7 @@ class Mnist:
   None
   """
 
-  def __init__(self, data_home = './datasets/mnist', norm_mode=0):
+  def __init__(self, data_home = '~/.pyml/mnist', norm_mode=0):
     """Constructor
     """
     _logger.info("Saving MNIST dataset in {} ...".format(data_home))
