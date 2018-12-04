@@ -148,13 +148,53 @@ class Mnist:
     return images
 
 
+  @staticmethod
+  def imageToGroundTruth(image, digit):
+    """Convert image to ground truth
+
+    Example image:
+      A 'one':
+    . . . . .
+    . . X . .
+    . . X . .
+    . . X . .
+    . . . . .
+
+    Example Ground truth:
+    0 0 0 0 0
+    0 0 2 0 0
+    0 0 2 0 0
+    0 0 2 0 0
+    0 0 0 0 0
+
+    Parameters
+    ----------
+    image : numpy.ndarray
+        Array representing an image.
+    digit : int
+        Digit in the image.
+
+    Returns
+    -------
+    dict
+        'digit' : int
+            digit of the image
+        'ground_truth' : numpy.ndarray(shape=image.shape, dtype=image.dtype)
+            Grouth truth. See an example above.
+    """
+    ret = np.full(image.shape, 0, dtype=image.dtype)
+    mask = image > 0
+    ret[mask] = digit+1
+    return {'digit': digit, 'ground_truth' : ret, 'mask' : mask}
+
+
 def _setGlobalRandomSeed(seed=316):
   random.seed(seed)
   np.random.seed(seed)
 
 def _test1():
   _logger.info("_test1()")
-  mnist = Mnist(norm_mode=1)
+  mnist = Mnist(norm_mode=0)
   random_digit = random.randrange(10)
   _logger.info("random digit: {}".format(random_digit))
   num_instances = len(mnist.digit_indices[random_digit])
@@ -163,7 +203,10 @@ def _test1():
   _logger.info("random index: {}".format(random_index))
   random_image_index = mnist.digit_indices[random_digit][random_index]
   _logger.info("random imgae index: {}".format(random_image_index))
-  _logger.info("image\n{}".format(1* (mnist.images[random_image_index].reshape((28,28)) > 0)))
+  random_image = mnist.images[random_image_index].reshape((28,28))
+  _logger.info("image\n{}".format(1* (random_image > 0)))
+  ground_truth = Mnist.imageToGroundTruth(random_image, random_digit)
+  _logger.info("Ground truth\n{}".format(ground_truth['ground_truth']))
 
 
 
