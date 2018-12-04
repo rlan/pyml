@@ -16,24 +16,24 @@ _logger = log.setup('info')
 
 class Mnist:
   """Fetch, store and serve MNIST dataset.
+
+  Parameters
+  ----------
+  data_home : str
+      Location of local storage for Mnist dataset.
+  norm_mode : int
+      Image normalization mode for Mnist images.
+      0 (default) - raw values.
+      1 - normalize to [0, 1]
+      2 - normalize to [-1, 1]
+
+  Returns
+  -------
+  None
   """
 
   def __init__(self, data_home = './datasets/mnist', norm_mode=0):
     """Constructor
-
-    Parameters
-    ----------
-    data_home : str
-        Location of local storage for Mnist dataset.
-    norm_mode : int
-        Image normalization mode for Mnist images.
-        0 (default) - raw values.
-        1 - normalize to [0, 1]
-        2 - normalize to [-1, 1]
-
-    Return
-    ------
-    None
     """
     _logger.info("Saving MNIST dataset in {} ...".format(data_home))
     t0 = datetime.now()
