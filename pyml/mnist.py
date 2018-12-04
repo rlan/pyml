@@ -9,10 +9,10 @@ import sys
 
 import numpy as np
 from sklearn.datasets import fetch_mldata
-
+import log
 
 # Attach to global logger
-_logger = logging.getLogger('app.' + os.path.basename(__file__))
+_logger = log.setup('info')
 
 class Mnist:
   """Fetch, store and serve MNIST dataset.
@@ -148,24 +148,12 @@ class Mnist:
     return images
 
 
-
 def _setGlobalRandomSeed(seed=316):
   random.seed(seed)
   np.random.seed(seed)
 
-def _setupLogging():
-  logger = logging.getLogger('app')
-  logger.setLevel(logging.DEBUG)
-  # create console handler with a higher log level
-  ch = logging.StreamHandler()
-  ch.setLevel(logging.DEBUG)
-  # create formatter and add it to the handlers
-  formatter = logging.Formatter('%(name)s:%(levelname)s:%(message)s')
-  ch.setFormatter(formatter)
-  logger.addHandler(ch)
-  return logger
-
 def _test1():
+  _logger.info("_test1()")
   mnist = Mnist(norm_mode=1)
   random_digit = random.randrange(10)
   _logger.info("random digit: {}".format(random_digit))
@@ -181,5 +169,4 @@ def _test1():
 
 if __name__ == "__main__":
   _setGlobalRandomSeed()
-  _setupLogging()
   _test1()
