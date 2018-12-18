@@ -9,7 +9,7 @@ import sys
 
 import numpy as np
 from sklearn.datasets import fetch_mldata
-import log
+from . import log
 
 # Attach to global logger
 _logger = log.setup('info')
@@ -50,6 +50,19 @@ class Mnist:
     self._inspectDatasetStats(self.digit_indices, dataset.data)
     self._inspectImages(dataset.data)
     self._inspectImages(self.images)
+
+    # Split into train and test set
+    self.train_digit_indices = dict()
+    self.test_digit_indices = dict()
+    for digit in range(0, 10):
+      stop = round(self.digit_indices[digit].size * 6.0/7.0)
+      self.train_digit_indices[digit] = self.digit_indices[digit][:stop]
+      self.test_digit_indices[digit] = self.digit_indices[digit][stop:]
+    _logger.debug("train_digit_indices")
+    self._inspectDatasetStats(self.train_digit_indices, dataset.data)
+    _logger.debug("test_digit_indices")
+    self._inspectDatasetStats(self.test_digit_indices, dataset.data)
+
     tdelta = datetime.now() - t1
     _logger.info("Dataset processed in {} seconds".format(tdelta.total_seconds()))
 
@@ -186,30 +199,3 @@ class Mnist:
     mask = image > 0
     ret[mask] = digit+1
     return {'digit': digit, 'ground_truth' : ret, 'mask' : mask}
-
-
-def _setGlobalRandomSeed(seed=316):
-  random.seed(seed)
-  np.random.seed(seed)
-
-def _test1():
-  _logger.info("_test1()")
-  mnist = Mnist(norm_mode=0)
-  random_digit = random.randrange(10)
-  _logger.info("random digit: {}".format(random_digit))
-  num_instances = len(mnist.digit_indices[random_digit])
-  _logger.info("count of {} digits: {}".format(random_digit, num_instances))
-  random_index = random.randrange(num_instances)
-  _logger.info("random index: {}".format(random_index))
-  random_image_index = mnist.digit_indices[random_digit][random_index]
-  _logger.info("random imgae index: {}".format(random_image_index))
-  random_image = mnist.images[random_image_index].reshape((28,28))
-  _logger.info("image\n{}".format(1* (random_image > 0)))
-  ground_truth = Mnist.imageToGroundTruth(random_image, random_digit)
-  _logger.info("Ground truth\n{}".format(ground_truth['ground_truth']))
-
-
-
-if __name__ == "__main__":
-  _setGlobalRandomSeed()
-  _test1()
