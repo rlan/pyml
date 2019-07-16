@@ -4,54 +4,116 @@ from __future__ import print_function
 from datetime import datetime
 import logging
 import os
+import os.path
+import pickle
 import random
 import sys
 
 import numpy as np
 from sklearn.datasets import fetch_mldata
-
+from . import log
 
 # Attach to global logger
-_logger = logging.getLogger('app.' + os.path.basename(__file__))
+_logger = log.setup('info')
 
 class Mnist:
   """Fetch, store and serve MNIST dataset.
+
+  Parameters
+  ----------
+  data_home : str
+      Location of local storage for Mnist dataset.
+  norm_mode : int
+      Image normalization mode for Mnist images.
+      0 (default) - raw values.
+      1 - normalize to [0, 1]
+      2 - normalize to [-1, 1]
+
+  Returns
+  -------
+  self.images : An array of vector representing the pixel value of the image.
+  self.digit_indices : A 2-D array whose first axis is the digit and second axis
+      the index to self.images.
+  self.train_digit_indices : Submatrix of self.digit_indices for training.
+  self.test_digit_indices : Submatrix of self.digit_indices for test.
   """
 
-  def __init__(self, data_home = './datasets/mnist', norm_mode=0):
+  def __init__(self, data_home = os.path.expanduser('~') +'/.pyml/mnist', norm_mode=0):
     """Constructor
-
-    Parameters
-    ----------
-    data_home : str
-        Location of local storage for Mnist dataset.
-    norm_mode : int
-        Image normalization mode for Mnist images.
-        0 (default) - raw values.
-        1 - normalize to [0, 1]
-        2 - normalize to [-1, 1]
-
-    Return
-    ------
-    None
     """
-    _logger.info("Saving MNIST dataset in {} ...".format(data_home))
+    if norm_mode < 0 or norm_mode > 2:
+      raise ValueError("Invalid norm_mode: {}".format(norm_mode))
+
+    file_name = data_home + "/data{}.pkl".format(norm_mode)
+    if os.path.isfile(file_name):
+      _logger.info("Loading MNIST dataset from {} ...".format(file_name))
+      t0 = datetime.now()
+      self._data = pickle.load(open(file_name, 'rb'))
+      tdelta = datetime.now() - t0
+      _logger.info("Loaded in {} seconds".format(tdelta.total_seconds()))
+    else:
+      dataset = Mnist._fetchMNIST(data_home)
+      self._data = Mnist._processMNIST(dataset, norm_mode)
+      _logger.info("Saving post-processed data to {} ...".format(file_name))
+      t0 = datetime.now()
+      pickle.dump(self._data, open(file_name, 'wb'))
+      tdelta = datetime.now() - t0
+      _logger.info("Saved in {} seconds".format(tdelta.total_seconds()))
+
+    # Unpack data
+    self.images = self._data['images']
+    self.digit_indices = self._data['digit_indices']
+    self.train_digit_indices = self._data['train_digit_indices']
+    self.test_digit_indices = self._data['test_digit_indices']
+
+
+  @staticmethod
+  def _fetchMNIST(data_home = os.path.expanduser('~')+'/.pyml/mnist'):
+    _logger.info("Fetching MNIST dataset in {} ...".format(data_home))
     t0 = datetime.now()
     dataset = fetch_mldata('MNIST original', data_home=data_home)
+    Mnist._inspectDataset(dataset)
     t1 = datetime.now()
     tdelta = t1 - t0
-    _logger.info("Dataset saved in {} seconds".format(tdelta.total_seconds()))
-    self._inspectDataset(dataset)
+    _logger.info("Fetched in {} seconds".format(tdelta.total_seconds()))
+    return dataset
 
-    self.digit_indices = dict()
+  
+  @staticmethod
+  def _processMNIST(dataset, norm_mode=0):
+    _logger.info("Post-processing MNIST dataset...")
+    t0 = datetime.now()
+    digit_indices = dict()
     for digit in range(0, 10):
-      self.digit_indices[digit] = np.flatnonzero(dataset.target == digit)
-    self.images = self.normalize(dataset.data, norm_mode)
-    self._inspectDatasetStats(self.digit_indices, dataset.data)
-    self._inspectImages(dataset.data)
-    self._inspectImages(self.images)
-    tdelta = datetime.now() - t1
-    _logger.info("Dataset processed in {} seconds".format(tdelta.total_seconds()))
+      digit_indices[digit] = np.flatnonzero(dataset.target == digit)
+    images = Mnist.normalize(dataset.data, norm_mode)
+    Mnist._inspectDatasetStats(digit_indices, dataset.data)
+    Mnist._inspectImages(dataset.data)
+    Mnist._inspectImages(images)
+
+    # Split into train and test set
+    train_digit_indices = dict()
+    test_digit_indices = dict()
+    for digit in range(0, 10):
+      stop = round(digit_indices[digit].size * 6.0/7.0)
+      train_digit_indices[digit] = digit_indices[digit][:stop]
+      test_digit_indices[digit] = digit_indices[digit][stop:]
+    _logger.debug("train_digit_indices")
+    Mnist._inspectDatasetStats(train_digit_indices, dataset.data)
+    _logger.debug("test_digit_indices")
+    Mnist._inspectDatasetStats(test_digit_indices, dataset.data)
+
+    tdelta = datetime.now() - t0
+    _logger.info("Post-processed in {} seconds".format(tdelta.total_seconds()))
+
+    ret = { 
+      'images' : images, 
+      'digit_indices' : digit_indices, 
+      'train_digit_indices' : train_digit_indices, 
+      'test_digit_indices' : test_digit_indices
+    }
+    return ret
+
 
   @staticmethod
   def _inspectDataset(dataset):
@@ -63,6 +125,7 @@ class Mnist:
     _logger.debug("dataset.target.shape {}".format(dataset.target.shape))
     _logger.debug("type(dataset.target.shape) {}".format(type(dataset.target.shape)))
 
+
   @staticmethod
   def _inspectDatasetStats(digit_indices, images):
     # Show stats of the dataset
@@ -73,6 +136,7 @@ class Mnist:
     for i in range(0, 10):
       _logger.debug("{} has {} data point(s)".format(i, len(digit_indices[i])))
     
+
   @staticmethod
   def _inspectImages(images):
     _logger.debug("images.min {} .max {}".format(np.amin(images), np.amax(images)))
@@ -115,6 +179,7 @@ class Mnist:
     _logger.debug("images.dtype {} should be float".format(images.dtype))
     return images
 
+
   @staticmethod
   def unnormalize(images, norm_mode=0):
     """Un-normalize MNIST data
@@ -148,38 +213,41 @@ class Mnist:
     return images
 
 
+  @staticmethod
+  def imageToGroundTruth(image, digit):
+    """Convert image to ground truth
 
-def _setGlobalRandomSeed(seed=316):
-  random.seed(seed)
-  np.random.seed(seed)
+    Example image:
+      A 'one':
+    . . . . .
+    . . X . .
+    . . X . .
+    . . X . .
+    . . . . .
 
-def _setupLogging():
-  logger = logging.getLogger('app')
-  logger.setLevel(logging.DEBUG)
-  # create console handler with a higher log level
-  ch = logging.StreamHandler()
-  ch.setLevel(logging.DEBUG)
-  # create formatter and add it to the handlers
-  formatter = logging.Formatter('%(name)s:%(levelname)s:%(message)s')
-  ch.setFormatter(formatter)
-  logger.addHandler(ch)
-  return logger
+    Example Ground truth:
+    0 0 0 0 0
+    0 0 2 0 0
+    0 0 2 0 0
+    0 0 2 0 0
+    0 0 0 0 0
 
-def _test1():
-  mnist = Mnist(norm_mode=1)
-  random_digit = random.randrange(10)
-  _logger.info("random digit: {}".format(random_digit))
-  num_instances = len(mnist.digit_indices[random_digit])
-  _logger.info("count of {} digits: {}".format(random_digit, num_instances))
-  random_index = random.randrange(num_instances)
-  _logger.info("random index: {}".format(random_index))
-  random_image_index = mnist.digit_indices[random_digit][random_index]
-  _logger.info("random imgae index: {}".format(random_image_index))
-  _logger.info("image\n{}".format(1* (mnist.images[random_image_index].reshape((28,28)) > 0)))
+    Parameters
+    ----------
+    image : numpy.ndarray
+        Array representing an image.
+    digit : int
+        Digit in the image.
 
-
-
-if __name__ == "__main__":
-  _setGlobalRandomSeed()
-  _setupLogging()
-  _test1()
+    Returns
+    -------
+    dict
+        'digit' : int
+            digit of the image
+        'ground_truth' : numpy.ndarray(shape=image.shape, dtype=image.dtype)
+            Grouth truth. See an example above.
+    """
+    ret = np.full(image.shape, 0, dtype=image.dtype)
+    mask = image > 0
+    ret[mask] = digit+1
+    return {'digit': digit, 'ground_truth' : ret, 'mask' : mask}
