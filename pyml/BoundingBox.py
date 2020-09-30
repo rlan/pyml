@@ -264,7 +264,6 @@ class BoundingBox:
      [0 0]]
     """
 
-    from BoundingBox import Line
     # row
     line_first = Line( first.ul()[0], first.lr()[0] )
     line_second = Line( second.ul()[0], second.lr()[0] )
